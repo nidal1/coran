@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import {alquran , mp3quran} from '../api/config';
+import jsonData from '../assets/json/data.json';
 
 export default class App extends Component {
 
   constructor(props){
     super(props);
     this.state = {
-      data : {
-        koraeArr: [],
-        surahArr :[]
-      },
+      data : JSON.parse(JSON.stringify(jsonData)),
       playlist:{
         playingNow:0,
         playlistTitle:"",
@@ -63,6 +61,8 @@ export default class App extends Component {
     this.myAudioVolumeRef = React.createRef();
     this.myPlaylistRef = React.createRef();
     this.myModelRef = React.createRef();
+    this.myReciterOptionRef = React.createRef();
+    this.mySurahOptionRef = React.createRef();
   }
 
   // HANDELLERS
@@ -123,14 +123,19 @@ export default class App extends Component {
   }
 
   handelleModelOption = (i, optionType) => {
+    let data = this.state.data.filter((el) => {
+      return el.reciterMedia.length === 114;
+    }
+    );
+
     if (optionType === "korae") {
-      let koraeOptionSelectedItemText =this.state.data.koraeArr[i].name;
+      let koraeOptionSelectedItemText =data[i].reciterInfos;
       this.setState({
         isKoraeShowOption:false,
         koraeOptionSelectedItemText
       })
     }else{
-      let surahOptionSelectedItemText =this.state.data.surahArr[i].surahName;
+      let surahOptionSelectedItemText =data[0].reciterMedia[i].surahName;
       this.setState({
         isSuwarShowOption:false,
         surahOptionSelectedItemText
@@ -180,16 +185,27 @@ export default class App extends Component {
       });
     }
 
-    let reciter = this.state.data.koraeArr.filter((el) => {
-      return el.name === this.state.koraeOptionSelectedItemText;
-    });
-    let surahNum = this.state.data.surahArr.filter((el) => {
+    let data = this.state.data.filter((el) => {
+      return el.reciterMedia.length === 114;
+    }
+    );
+
+    let optionsAudioLink = data.filter((el) => {
+      return el.reciterInfos === this.state.koraeOptionSelectedItemText;
+    }).reduce((prevVal, currVal,i) => {
+      return currVal;
+    }
+    );
+
+    optionsAudioLink = optionsAudioLink.reciterMedia.filter((el) => {
       return el.surahName === this.state.surahOptionSelectedItemText;
-    });
-    reciter = `${reciter[0].server}/${this.formatSurahNum(surahNum[0].num)}.mp3`;
+    }).reduce((prevVal, currVal,i) => {
+      return currVal;
+    }
+    );
 
     this.setState({
-      optionsAudioLink: reciter,
+      optionsAudioLink: optionsAudioLink.server,
       isShowModelSetting: false,
       isSurahErrorCheckingShow : false,
       isKoraeErrorCheckingShow : false
@@ -206,7 +222,6 @@ export default class App extends Component {
   }
 
   handelleModelIsPlayingNow = (index) => {
-    
     this.setState((state) => {
       if (index === state.playlist.playingNow) {
         this.handellePlayAudio("modelPlayListSubmit");
@@ -215,40 +230,24 @@ export default class App extends Component {
     }
     );
   }
-  
-  // GETTERS
 
-  getData = async () => {
-    if (!this.state.data.surahArr.length && !this.state.data.koraeArr.length) {
-      try {
-        let dataFromMp3quran,dataFromAlquran;
-        let res1 = await mp3quran.get("");
-        console.log(res1);
-        let res2 = await alquran.get("");
-        console.log(res2);
-        // .then(function (response) {
-        //   res2 = response.data.reciters.filter((el) => {
-        //       return el.count === "114" && el.rewaya === "حفص عن عاصم"
-        //     });
-        // });
-        
-        
-        // const [koraeArr,surahArr] = [this.getReciters(res1), this.getSurah(res2)];
-        // this.setState({
-        //   data : {
-        //     koraeArr : [...koraeArr] ,
-        //     surahArr: [...surahArr]
-        //   }
-          
-        // },() => {
-        //   this.makePlayList(this.state);
-        // });
-      } catch (error) {
-        console.error(error);
+  handelleModelIsPlayingNowWidth_490 = (index) => {
+
+    if (window.innerWidth <= 490) {
+      this.setState((state) => {
+        if (index === state.playlist.playingNow) {
+          this.handellePlayAudio("modelPlayListSubmit");
+        }
+        return {
+          isShowModelActivePlaylist:true,
+          playlist:{...state.playlist,playingNow : index}
+        }
       }
-      
+      );
     }
   }
+  
+  // GETTERS
 
   getReciters = (data) => {
     const korae = data.map((el) => {
@@ -303,20 +302,24 @@ export default class App extends Component {
 
   makePlayList = (state) => {
 
-    const playlistArr = state.playlist.playlistArr ;
-    const koraeArr = state.data.koraeArr ;
-    if (!playlistArr.length) {
+    let data = this.state.data.filter((el) => {
+      return el.reciterMedia.length === 114;
+    }
+    );
+
+    if (!this.state.playlist.playlistArr.length) {
       const playlistArr = [];
         for (let index = 0; index < 114; index++) {
-
-          let link = koraeArr[Math.ceil(Math.random() * 98)];
-          let reciter = link.name;
-          link = link.server;
-          link += `/${this.formatSurahNum(index +1)}.mp3`;
+          let randNum = Math.round(Math.random() *111);
+          
+          let server,surahName,reciter;
+          reciter= data[randNum].reciterInfos;
+          server= data[randNum].reciterMedia[index].server;
+          surahName= data[randNum].reciterMedia[index].surahName;
           playlistArr.push({
             reciter: reciter,
-            surahName: state.data.surahArr[index].surahName,
-            link : link
+            surahName: surahName,
+            link : server
           });
         }
         this.setState({ 
@@ -324,8 +327,7 @@ export default class App extends Component {
             playingNow:0,
             playlistTitle:"",
             playlistArr:[...playlistArr]
-          }
-        },this.setPlaylistTitle)
+          }})
     }
 
   }
@@ -334,23 +336,27 @@ export default class App extends Component {
     let playlistArr = this.state.playlist.playlistArr ;
     
     if (playlistArr.length) {
+      
       playlistArr = playlistArr.map((el , i) => {
         let isPlaying = (this.state.playlist.playingNow === i) && (this.state.isPlayed);
         let isPlayingNow = (this.state.playlist.playingNow === i);
         return (
           <div 
-            className="model"
+            className={`model ${isPlayingNow ? 'activeOn490':''}`}
             key={i}
             id={i}
-            ref={this.myModelRef}>
+            ref={this.myModelRef}
+            onClick={()=>this.handelleModelIsPlayingNowWidth_490(i)}
+            >
             <div 
-              className="playingNow"
+              className="playingNow d-none-xm"
               onClick={() =>this.handelleModelIsPlayingNow(i)}>
               {isPlaying ? <i className="fas fa-pause"></i> : <i className="fas fa-play"></i>}
             </div>
-            <div className="modelInfos">
+            <div 
+              className="modelInfos">
         <div className="modelInfosCurrentSuhar"><span className="CurrentSurah ml-5">{el.surahName}</span> - <span className="currentKaree mr-5">{el.reciter}</span></div>
-              <div className="modelInfosTimer">
+              <div className="modelInfosTimer d-none-xm">
                 {isPlayingNow ? this.state.currentAudioTime : "00:00:00" }
               </div>
             </div>
@@ -397,7 +403,7 @@ export default class App extends Component {
   setPlaylistTitle =() => {
     let playingNow,currentReciter,currentSurah;
     playingNow = this.state.playlist.playingNow;
-    [currentReciter,currentSurah] = [this.state.data.koraeArr[playingNow].name,this.state.data.surahArr[playingNow].surahName];
+    [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
     let playlistTitle = `${currentSurah} - ${currentReciter}`;
     this.setState((state) => {
       return {
@@ -460,12 +466,12 @@ export default class App extends Component {
     return `${num}`;
   }
 
-  scrollToModel = (id,state) => {
-    if (!state.playlist.playlistArr.length || id === state.playlist.playingNow) {
-      return;
-    }
-    this.myPlaylistRef.current.scrollTo(0,state.playlist.playingNow * 85);
-  }
+  // scrollToModel = (id,state) => {
+  //   if (!state.playlist.playlistArr.length || id === state.playlist.playingNow) {
+  //     return;
+  //   }
+  //   this.myPlaylistRef.current.scrollTo(0,state.playlist.playingNow * 85);
+  // }
 
   incrimentPlaylist = (currVal) => {
     if (currVal < 114) {
@@ -480,24 +486,22 @@ export default class App extends Component {
   this.myAudioRef.current.volume = this.state.currentAudioVolumeValue;
   } 
   componentDidUpdate(prevP,prevS){
-    this.scrollToModel(this.state.playlist.isPlayingNow,this.state);
+    // if (prevS.) {
+      
+    // }
+    // this.scrollToModel(this.state.playlist.isPlayingNow,this.state);
   }
   
 
   componentDidMount(){
-
-     this.getData();
-    const jsonData = require('../assets/json/data.json');
-    let obj = JSON.parse(jsonData);
-    console.log(obj)
-    
+    this.makePlayList();
     this.myAudioRef.current.addEventListener('loadedmetadata', () => {
       let duration = this.myAudioRef.current.duration;
       duration = this.getAudioValues(duration);
       this.setState({
         duration,
         isShowSpiner:false
-      },this.playAudio)
+      },this.setPlaylistTitle)
     },false);
     
     this.myAudioRef.current.addEventListener("timeupdate", () => {
@@ -524,7 +528,7 @@ export default class App extends Component {
           return {
             audioToastPosition : 0,
             audioBufferAmount :0,
-            isPlayed: false,
+            isPlayed: true,
             playlist:{
               playingNow : this.incrimentPlaylist(state.playlist.playingNow),
               playlistArr : state.playlist.playlistArr
@@ -538,37 +542,39 @@ export default class App extends Component {
   }
 
   render() {
+    
     let audioDuration = this.state.duration;
 
     const currentAudioTime = this.state.currentAudioTime;
-    const koraeOptions = this.state.data.koraeArr.map((el, i) => {
+    const koraeOptions = this.state.data.filter((el) => {
+      return el.reciterMedia.length === 114;
+    }
+    ).map((el, i) => {
       return (<div 
         key={i}
         className="optionItem"
         onClick={() => this.handelleModelOption(i, "korae")}>
-        <p>{el.name}</p>
+        <p>{el.reciterInfos}</p>
       </div>)
+    });
+
+    let suwarOptions = this.state.data.filter((el) => {
+      return el.reciterMedia.length === 114;
     }
     );
-
-    
-    const suwarOptions = this.state.data.surahArr.map((el, i) => {
+    suwarOptions = suwarOptions[0].reciterMedia.map((el, i) => {
       return (<div 
         key={i}
         className="optionItem"
         onClick={() => this.handelleModelOption(i, "surah")}>
         <p>{el.surahName}</p>
       </div>)
-    }
-    );
+    });
+    
 
     const playlist = this.setPlaylist();
     let maxRange = this.convertToSeconds(audioDuration);
     let value = this.convertToSeconds(currentAudioTime);
-    /**
-     * TODO
-     * Spiner
-     */
     return (
       <React.Fragment>
         <div 
@@ -592,13 +598,13 @@ export default class App extends Component {
               </li>
             </ul>
           </nav>
-          <div className="navLinks">
+          {/* <div className="navLinks">
             <ul className="links">
               <a href="/">
               <li>الهدف من الموقع</li>
               </a>
             </ul>
-          </div>
+          </div> */}
         </header>
         <main>
           <div className="heading">
@@ -607,7 +613,7 @@ export default class App extends Component {
             بسم الله الرحمن الرحيم
             </span>
             <span>قُلْ أُوحِيَ إِلَيَّ أَنَّهُ اسْتَمَعَ نَفَرٌ مِّنَ الْجِنِّ فَقَالُوا إِنَّا سَمِعْنَا قُرْآنًا عَجَبًا
-            <br className="d-none-xm"/>
+            <br className="d-none-xm d-none-s"/>
 
 يَهْدِي إِلَى الرُّشْدِ فَآمَنَّا بِهِ وَلَن نُّشْرِكَ بِرَبِّنَا أَحَدًا</span>
           </h1>
@@ -675,7 +681,7 @@ export default class App extends Component {
               onClick={this.handellePlayListClick}>
                 <i className="fas fa-indent"></i>
             </div>
-            <div className="currentPlayList d-none-xm">
+            <div className="currentPlayList d-none-xm d-none-s ">
               <div className="frontText slide-right-front">{this.state.playlist.playlistTitle}</div>
               <div className="backText slide-right-back">{this.state.playlist.playlistTitle}</div>
             </div>

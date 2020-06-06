@@ -640,7 +640,7 @@ main .playlist .timer .rangeContainer .timerToast{
   transform: translate(-35%, 0);
 }
 main .playlist .timer .rangeContainer:hover .timerToast{
-  display: inline-block;
+  display: none;
   
 }
 
@@ -884,6 +884,7 @@ main .playlist .currentPlayList .backText{
 
 .modelContainer .playlist .model{
   flex-direction: row;
+  box-sizing: border-box;
 }
 
 .modelContainer .playlist .model:not(:last-child){
@@ -907,7 +908,7 @@ main .playlist .currentPlayList .backText{
 
 
 @media screen and (max-width: 980px){
-  .d-none-xm{
+  .d-none-s{
     display: none !important;
   }
 
@@ -938,6 +939,125 @@ main .playlist .currentPlayList .backText{
     font-size: 15px;
     margin-bottom: 10px;
   }
+}
+
+@media screen and (max-width: 490px){
+  .d-none-xm{
+    display: none !important;
+  }
+
+  .d-flex-sm{
+    display: flex !important;
+  }
+
+  header nav a.logo {
+    font-size: 22px;
+  }
+
+  main .playlist .timer {
+    width: auto;
+    flex-grow: 2;
+    padding: 0 10px;
+  }
+
+  .currentPlayList{
+    background: #b2dbbf;
+  }
+  main .heading {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  main .heading h1{
+      line-height: 28px;
+      font-size: 1em;
+  }
+  
+  main .heading h1 .subHeading{
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  main .playlist {
+
+    justify-self: flex-end;
+    width: 100%;
+    background-color: #b2dbbf;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}
+main .playlist .timer {
+  padding: 14px 10px;
+
+}
+
+main .playlist .play, main .playlist .playlistInfos, main .playlist .playlistSetting, .modelContainer .model .modelSubmit, .modelContainer .model .cancelModel, .modelContainer .model .playingNow {
+
+  height: 42px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #ff1654;
+  margin-bottom: 5px;
+  order: 2;
+  margin-right: 0;
+
+}
+
+.currentPlayList {
+  font-size: 13px;
+
+}
+
+.slide-right-front, .slide-right-back {
+  top: 0;
+
+}
+
+.model {
+  height: auto;
+  flex-direction: column;
+}
+
+.modelContainer .model label {  
+  margin-bottom: 5px;
+
+}
+
+
+.modelContainer .model .modelSelect {
+
+  padding: 14px 5px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 5px;
+
+}
+
+.modelContainer .model .modelSubmit{
+  margin-bottom: 0;
+}
+
+.modelContainer .model .modelSelect .options .optionItem {
+  z-index: 1;
+  background: #b2dbbf;
+
+}
+
+.modelContainer .playlist .model .modelInfos .modelInfosCurrentSuhar {
+  height: 50px;
+  display: flex;
+  align-items: center;
+
+}
+
+.modelContainer .playlist .model.activeOn490 {
+  border-right: #ff1654 4px solid;
+}
+
 }
 
 /* ABOUT */
