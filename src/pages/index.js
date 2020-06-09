@@ -212,8 +212,8 @@ export default class App extends Component {
     },this.setAudioSettingTitle);
   }
 
-  handelleAudioVolume = () => {
-    let currentAudioVolumeValue = this.myAudioVolumeRef.current.value / 100;
+  handelleAudioVolume = (e) => {
+    let currentAudioVolumeValue = e.target.value / 100;
     this.setState((state) => {
       return {
         currentAudioVolumeValue
@@ -225,7 +225,7 @@ export default class App extends Component {
     this.setState((state) => {
       if (index === state.playlist.playingNow) {
         this.handellePlayAudio("modelPlayListSubmit");
-      }
+      } 
       return {playlist:{...state.playlist,playingNow : index}}
     }
     );
@@ -575,6 +575,7 @@ export default class App extends Component {
     const playlist = this.setPlaylist();
     let maxRange = this.convertToSeconds(audioDuration);
     let value = this.convertToSeconds(currentAudioTime);
+    let audioVal = this.state.currentAudioVolumeValue;
     return (
       <React.Fragment>
         <div 
@@ -641,7 +642,7 @@ export default class App extends Component {
                   min="0" 
                   max={maxRange} 
                   value={value}
-                  onChange={this.handelleInputChange}
+                  onChange={(e)=>this.handelleInputChange(e)}
                 />
                 <div 
                   className="bufferAmount"
@@ -658,7 +659,7 @@ export default class App extends Component {
               </div>
               <div className="endingTimer mr-5">{audioDuration}</div>
               <div className="timerVolume d-none-xm">
-                {this.state.currentAudioVolumeValue ? <i className="fas fa-volume-up mr-5"></i> : <i class="fas fa-volume-mute"></i>}
+                {this.state.currentAudioVolumeValue ? <i className="fas fa-volume-up mr-5"></i> : <i className="fas fa-volume-mute"></i>}
                 
                 <div className="rangeContainer">
                   <input 
@@ -666,8 +667,9 @@ export default class App extends Component {
                     className="InputRange"
                     min="0"
                     max="100"
+                    value={audioVal * 100}
                     ref={this.myAudioVolumeRef}
-                    onChange={this.handelleAudioVolume}/>
+                    onChange={(e)=>this.handelleAudioVolume(e)}/>
                 </div>
               </div>
             </div>

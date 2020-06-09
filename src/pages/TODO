@@ -1,7 +1,7 @@
 [x] refacoring code for new json file
     [] refactoring pause click on currect playlist
-[] enable toast
-[] media queres:
-    [] option section
-    [] setting section
-[] css prefixes
+[x] enable toast
+[x] media queres:
+    [x] option section
+    [x] setting section
+[x] css prefixes
