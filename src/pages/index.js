@@ -209,7 +209,11 @@ export default class App extends Component {
       isShowModelSetting: false,
       isSurahErrorCheckingShow : false,
       isKoraeErrorCheckingShow : false
-    },this.setAudioSettingTitle);
+    },()=>{
+      console.log("Entred From [handelleSubmitOptionsClick]")
+      let [currentReciter,currentSurah] = [this.state.koraeOptionSelectedItemText,this.state.surahOptionSelectedItemText];
+      this.setPlaylistTitle(currentReciter,currentSurah);
+    });
   }
 
   handelleAudioVolume = (e) => {
@@ -327,7 +331,12 @@ export default class App extends Component {
             playingNow:0,
             playlistTitle:"",
             playlistArr:[...playlistArr]
-          }})
+          }},()=>{
+            let playingNow,currentReciter,currentSurah;
+            playingNow = this.state.playlist.playingNow;
+            [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+            this.setPlaylistTitle(currentReciter,currentSurah);
+          })
     }
 
   }
@@ -400,10 +409,7 @@ export default class App extends Component {
     }
   }
 
-  setPlaylistTitle =() => {
-    let playingNow,currentReciter,currentSurah;
-    playingNow = this.state.playlist.playingNow;
-    [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+  setPlaylistTitle =(currentReciter,currentSurah) => {
     let playlistTitle = `${currentSurah} - ${currentReciter}`;
     this.setState((state) => {
       return {
@@ -413,19 +419,6 @@ export default class App extends Component {
       }
     }});
   }
-  
-  setAudioSettingTitle = () => {
-    let [currentReciter,currentSurah] = [this.state.koraeOptionSelectedItemText,this.state.surahOptionSelectedItemText];
-    let playlistTitle = `${currentSurah} - ${currentReciter}`;
-    this.setState((state) => {
-      return {
-        playlist:{
-          ...state.playlist,
-          playlistTitle
-      }
-    }});
-  }
-  
   
   
   // HELPERS
@@ -501,7 +494,7 @@ export default class App extends Component {
       this.setState({
         duration,
         isShowSpiner:false
-      },this.setPlaylistTitle)
+      })
     },false);
     
     this.myAudioRef.current.addEventListener("timeupdate", () => {
@@ -530,11 +523,19 @@ export default class App extends Component {
             audioBufferAmount :0,
             isPlayed: true,
             playlist:{
+              ...this.state.playlist,
               playingNow : this.incrimentPlaylist(state.playlist.playingNow),
               playlistArr : state.playlist.playlistArr
             }
           }
-        },this.setPlaylistTitle);
+        },()=>{
+          console.log("Entred From [ended]");
+          let playingNow,currentReciter,currentSurah;
+          playingNow = this.state.playlist.playingNow;
+          [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+          this.setPlaylistTitle(currentReciter,currentSurah);
+        }
+        );
 
       }
       
