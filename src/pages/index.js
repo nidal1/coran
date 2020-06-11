@@ -203,12 +203,22 @@ export default class App extends Component {
       return currVal;
     }
     );
+    let index;
+    const playlistArr = this.state.playlist.playlistArr.map((el,i) => {
+      if(el.surahName === this.state.surahOptionSelectedItemText){
+        el.reciter = this.state.koraeOptionSelectedItemText;
+        index = i;
+      }
+      return el;
+    }
+    )
 
     this.setState({
       optionsAudioLink: optionsAudioLink.server,
       isShowModelSetting: false,
       isSurahErrorCheckingShow : false,
-      isKoraeErrorCheckingShow : false
+      isKoraeErrorCheckingShow : false,
+      playlist:{...this.state.playlist,playlistArr:playlistArr,playingNow : index}
     },()=>{
       let [currentReciter,currentSurah] = [this.state.koraeOptionSelectedItemText,this.state.surahOptionSelectedItemText];
       this.setPlaylistTitle(currentReciter,currentSurah);
@@ -225,27 +235,6 @@ export default class App extends Component {
   }
 
   handelleModelIsPlayingNow = (index) => {
-    this.setState((state) => {
-      if (index === state.playlist.playingNow) {
-        this.handellePlayAudio("modelPlayListSubmit");
-        return;
-      } 
-      return {
-        audioBufferAmount:0,
-        currentAudioTime:"00:00:00",
-        playlist:{...state.playlist,playingNow : index}
-      }
-    },()=>{
-        let playingNow,currentReciter,currentSurah;
-        playingNow = this.state.playlist.playingNow;
-        [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
-        this.setPlaylistTitle(currentReciter,currentSurah);
-    }
-    );
-  }
-
-  handelleModelIsPlayingNow= (index) => {
-
     this.setState((state) => {
       if (index === state.playlist.playingNow) {
         this.handellePlayAudio("modelPlayListSubmit");
@@ -369,7 +358,7 @@ export default class App extends Component {
             key={i}
             id={i}
             ref={this.myModelRef}
-            onClick={()=>this.handelleModelIsPlayingNowWidth_490(i)}
+            onClick={()=>this.handelleModelIsPlayingNow(i)}
             >
             <div 
               className="playingNow d-none-xm">
