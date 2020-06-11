@@ -210,7 +210,6 @@ export default class App extends Component {
       isSurahErrorCheckingShow : false,
       isKoraeErrorCheckingShow : false
     },()=>{
-      console.log("Entred From [handelleSubmitOptionsClick]")
       let [currentReciter,currentSurah] = [this.state.koraeOptionSelectedItemText,this.state.surahOptionSelectedItemText];
       this.setPlaylistTitle(currentReciter,currentSurah);
     });
@@ -229,26 +228,41 @@ export default class App extends Component {
     this.setState((state) => {
       if (index === state.playlist.playingNow) {
         this.handellePlayAudio("modelPlayListSubmit");
+        return;
       } 
-      return {playlist:{...state.playlist,playingNow : index}}
+      return {
+        audioBufferAmount:0,
+        currentAudioTime:"00:00:00",
+        playlist:{...state.playlist,playingNow : index}
+      }
+    },()=>{
+        let playingNow,currentReciter,currentSurah;
+        playingNow = this.state.playlist.playingNow;
+        [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+        this.setPlaylistTitle(currentReciter,currentSurah);
     }
     );
   }
 
-  handelleModelIsPlayingNowWidth_490 = (index) => {
+  handelleModelIsPlayingNow= (index) => {
 
-    if (window.innerWidth <= 490) {
-      this.setState((state) => {
-        if (index === state.playlist.playingNow) {
-          this.handellePlayAudio("modelPlayListSubmit");
-        }
-        return {
-          isShowModelActivePlaylist:true,
-          playlist:{...state.playlist,playingNow : index}
-        }
+    this.setState((state) => {
+      if (index === state.playlist.playingNow) {
+        this.handellePlayAudio("modelPlayListSubmit");
+        return;
+      } 
+      return {
+        audioBufferAmount:0,
+        currentAudioTime:"00:00:00",
+        playlist:{...state.playlist,playingNow : index}
       }
-      );
+    },()=>{
+        let playingNow,currentReciter,currentSurah;
+        playingNow = this.state.playlist.playingNow;
+        [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+        this.setPlaylistTitle(currentReciter,currentSurah);
     }
+    );
   }
   
   // GETTERS
@@ -358,8 +372,7 @@ export default class App extends Component {
             onClick={()=>this.handelleModelIsPlayingNowWidth_490(i)}
             >
             <div 
-              className="playingNow d-none-xm"
-              onClick={() =>this.handelleModelIsPlayingNow(i)}>
+              className="playingNow d-none-xm">
               {isPlaying ? <i className="fas fa-pause"></i> : <i className="fas fa-play"></i>}
             </div>
             <div 
@@ -577,6 +590,7 @@ export default class App extends Component {
     let maxRange = this.convertToSeconds(audioDuration);
     let value = this.convertToSeconds(currentAudioTime);
     let audioVal = this.state.currentAudioVolumeValue;
+    let canPlay = this.state.isPlayed;
     return (
       <React.Fragment>
         <div 
@@ -622,7 +636,7 @@ export default class App extends Component {
           </div>
           <div className="playlist">
             <audio 
-              autoPlay={true}
+              autoPlay={canPlay}
               ref={this.myAudioRef}
               preload="metadata" 
               src={this.setLink()}>
