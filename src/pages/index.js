@@ -207,6 +207,7 @@ export default class App extends Component {
     const playlistArr = this.state.playlist.playlistArr.map((el,i) => {
       if(el.surahName === this.state.surahOptionSelectedItemText){
         el.reciter = this.state.koraeOptionSelectedItemText;
+        el.link = optionsAudioLink.server;
         index = i;
       }
       return el;
@@ -240,9 +241,23 @@ export default class App extends Component {
         this.handellePlayAudio("modelPlayListSubmit");
         return;
       } 
+      let data = state.data.filter((el) => {
+        return el.reciterMedia.length === 114;
+      }
+      );
+  
+      let optionsAudioLink = data.filter((el,i) => {
+        if(index === i){
+          return el;
+        }
+      }).reduce((prevVal, currVal,i) => {
+        return currVal;
+      }
+      );
       return {
         audioBufferAmount:0,
         currentAudioTime:"00:00:00",
+        optionsAudioLink: optionsAudioLink.server,
         playlist:{...state.playlist,playingNow : index}
       }
     },()=>{
