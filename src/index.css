@@ -239,6 +239,8 @@ fieldset {
 
 legend {
   box-sizing: border-box; /* 1 */
+  -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
   color: inherit; /* 2 */
   display: table; /* 1 */
   max-width: 100%; /* 1 */
@@ -270,6 +272,8 @@ textarea {
 [type="checkbox"],
 [type="radio"] {
   box-sizing: border-box; /* 1 */
+  -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
   padding: 0; /* 2 */
 }
 
@@ -979,6 +983,8 @@ main .playlist .currentPlayList .backText{
   display: flex;
   position: relative;
   box-sizing: border-box;
+  -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 
 .modelContainer .model .modelSelect .options .optionItem::after{
@@ -1021,6 +1027,8 @@ main .playlist .currentPlayList .backText{
       -ms-flex-direction: row;
           flex-direction: row;
   box-sizing: border-box;
+  -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 
 .modelContainer .playlist .model:not(:last-child){
@@ -1199,6 +1207,8 @@ main .playlist .play, main .playlist .playlistInfos, main .playlist .playlistSet
   padding: 14px 5px;
   width: 100%;
   box-sizing: border-box;
+  -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
   margin-bottom: 5px;
 
 }
