@@ -1219,8 +1219,10 @@ main .playlist .play, main .playlist .playlistInfos, main .playlist .playlistSet
 
 .modelContainer .model .modelSelect .options .optionItem {
   z-index: 1;
-  background: #b2dbbf;
-  padding: 5px 5px 10px 5px;
+    min-height: 27px;
+    align-items: center;
+    background: #b2dbbf;
+    padding: 0;
 }
 
 .modelContainer .playlist .model .modelInfos .modelInfosCurrentSuhar {
