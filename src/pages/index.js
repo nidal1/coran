@@ -7,12 +7,6 @@ export default class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      data : JSON.parse(JSON.stringify(jsonData)),
-      playlist:{
-        playingNow:0,
-        playlistTitle:"",
-        playlistArr:[]
-      },
       currentAudioVolumeValue:1,
       duration:"00:00:00",
       currentAudioTime:"00:00:00",
@@ -56,6 +50,12 @@ export default class App extends Component {
     // };
 
 
+    this.data = JSON.parse(JSON.stringify(jsonData));
+    this.playlist = {
+      playingNow:0,
+      playlistTitle:"",
+      playlistArr:[]
+    };
     this.myAudioRef = React.createRef();
     this.timerLineRef = React.createRef();
     this.myAudioVolumeRef = React.createRef();
@@ -63,6 +63,8 @@ export default class App extends Component {
     this.myModelRef = React.createRef();
     this.myReciterOptionRef = React.createRef();
     this.mySurahOptionRef = React.createRef();
+
+    this.makePlayList_1();
   }
 
   // HANDELLERS
@@ -123,7 +125,7 @@ export default class App extends Component {
   }
 
   handelleModelOption = (i, optionType) => {
-    let data = this.state.data.filter((el) => {
+    let data = this.data.filter((el) => {
       return el.reciterMedia.length === 114;
     }
     );
@@ -185,7 +187,7 @@ export default class App extends Component {
       });
     }
 
-    let data = this.state.data.filter((el) => {
+    let data = this.data.filter((el) => {
       return el.reciterMedia.length === 114;
     }
     );
@@ -204,7 +206,7 @@ export default class App extends Component {
     }
     );
     let index;
-    const playlistArr = this.state.playlist.playlistArr.map((el,i) => {
+    const playlistArr = this.playlist.playlistArr.map((el,i) => {
       if(el.surahName === this.state.surahOptionSelectedItemText){
         el.reciter = this.state.koraeOptionSelectedItemText;
         el.link = optionsAudioLink.server;
@@ -219,7 +221,7 @@ export default class App extends Component {
       isShowModelSetting: false,
       isSurahErrorCheckingShow : false,
       isKoraeErrorCheckingShow : false,
-      playlist:{...this.state.playlist,playlistArr:playlistArr,playingNow : index}
+      playlist:{...this.playlist,playlistArr:playlistArr,playingNow : index}
     },()=>{
       let [currentReciter,currentSurah] = [this.state.koraeOptionSelectedItemText,this.state.surahOptionSelectedItemText];
       this.setPlaylistTitle(currentReciter,currentSurah);
@@ -236,12 +238,12 @@ export default class App extends Component {
   }
 
   handelleModelIsPlayingNow = (index) => {
+    if (index === this.playlist.playingNow) {
+      this.handellePlayAudio("modelPlayListSubmit");
+      return;
+    } 
     this.setState((state) => {
-      if (index === state.playlist.playingNow) {
-        this.handellePlayAudio("modelPlayListSubmit");
-        return;
-      } 
-      let data = state.data.filter((el) => {
+      let data = this.data.filter((el) => {
         return el.reciterMedia.length === 114;
       }
       );
@@ -254,22 +256,29 @@ export default class App extends Component {
         return currVal;
       }
       );
+      this.playlist={...this.playlist,playingNow : index};
       return {
         audioBufferAmount:0,
         currentAudioTime:"00:00:00",
         optionsAudioLink: optionsAudioLink.server,
-        playlist:{...state.playlist,playingNow : index}
       }
     },()=>{
         let playingNow,currentReciter,currentSurah;
-        playingNow = this.state.playlist.playingNow;
-        [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+        playingNow = this.playlist.playingNow;
+        [currentReciter,currentSurah] = [this.playlist.playlistArr [playingNow].reciter,this.playlist.playlistArr[playingNow].surahName];
         this.setPlaylistTitle(currentReciter,currentSurah);
     }
     );
   }
   
   // GETTERS
+
+  setJSONData = (data) => {
+    if (!localStorage.getItem('data')) {
+      localStorage.setItem('data', data);
+    }
+  }
+  
 
   getReciters = (data) => {
     const korae = data.map((el) => {
@@ -324,12 +333,12 @@ export default class App extends Component {
 
   makePlayList = (state) => {
 
-    let data = this.state.data.filter((el) => {
+    let data = this.data.filter((el) => {
       return el.reciterMedia.length === 114;
     }
     );
 
-    if (!this.state.playlist.playlistArr.length) {
+    if (!this.playlist.playlistArr.length) {
       const playlistArr = [];
         for (let index = 0; index < 114; index++) {
           let randNum = Math.round(Math.random() *111);
@@ -344,29 +353,69 @@ export default class App extends Component {
             link : server
           });
         }
-        this.setState({ 
-          playlist : {
-            playingNow:0,
-            playlistTitle:"",
-            playlistArr:[...playlistArr]
-          }},()=>{
+        this.playlist = {
+          ...this.playlist,
+          playlistTitle:"",
+          playlistArr:[...playlistArr]
+        }
+        this.setState((state)=>{
             let playingNow,currentReciter,currentSurah;
-            playingNow = this.state.playlist.playingNow;
-            [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+            playingNow = this.playlist.playingNow;
+            [currentReciter,currentSurah] = [this.playlist.playlistArr [playingNow].reciter,this.playlist.playlistArr[playingNow].surahName];
             this.setPlaylistTitle(currentReciter,currentSurah);
           })
     }
 
   }
 
+  makePlayList_1 = () => {
+    if (!localStorage.getItem('playlist')) {
+      console.log("entred 1");
+      localStorage.setItem('playlist',JSON.stringify(this.playlist));
+      let data = this.data.filter((el) => {
+        return el.reciterMedia.length === 114;
+      }
+      );
+
+      const playlistArr = [];
+        for (let index = 0; index < 114; index++) {
+          let randNum = Math.round(Math.random() *111);
+          
+          let server,surahName,reciter;
+          reciter= data[randNum].reciterInfos;
+          server= data[randNum].reciterMedia[index].server;
+          surahName= data[randNum].reciterMedia[index].surahName;
+          playlistArr.push({
+            reciter: reciter,
+            surahName: surahName,
+            link : server
+          });
+        }
+        let playingNow,currentReciter,currentSurah;
+        playingNow = this.playlist.playingNow;
+        [currentReciter,currentSurah] = [playlistArr [playingNow].reciter,playlistArr[playingNow].surahName];
+        let playlistTitle = `${currentSurah} - ${currentReciter}`;
+        this.playlist = {
+          ...this.playlist,
+          playlistTitle:playlistTitle,
+          playlistArr:[...playlistArr]
+        }
+        localStorage.setItem('playlist',JSON.stringify(this.playlist));
+    }else{
+      console.log("entred 2");
+      this.playlist = {...JSON.parse(localStorage.getItem('playlist'))};
+    }
+
+  }
+
   setPlaylist = () => {
-    let playlistArr = this.state.playlist.playlistArr ;
+    let playlistArr = this.playlist.playlistArr ;
     
     if (playlistArr.length) {
       
       playlistArr = playlistArr.map((el , i) => {
-        let isPlaying = (this.state.playlist.playingNow === i) && (this.state.isPlayed);
-        let isPlayingNow = (this.state.playlist.playingNow === i);
+        let isPlaying = (this.playlist.playingNow === i) && (this.state.isPlayed);
+        let isPlayingNow = (this.playlist.playingNow === i);
         return (
           <div 
             className={`model ${isPlayingNow ? 'activeOn490':''}`}
@@ -415,26 +464,20 @@ export default class App extends Component {
   }
 
   setLink = () => {
-    if (!this.state.optionsAudioLink && !this.state.playlist.playlistArr.length) {
-      return null;
-    }
     if (this.state.optionsAudioLink ) {
       return this.state.optionsAudioLink ;
     }
-    if (this.state.playlist.playlistArr.length) {
-      return this.state.playlist.playlistArr[this.state.playlist.playingNow].link;
+    if (this.playlist.playlistArr.length) {
+      return this.playlist.playlistArr[this.playlist.playingNow].link;
     }
   }
 
   setPlaylistTitle =(currentReciter,currentSurah) => {
     let playlistTitle = `${currentSurah} - ${currentReciter}`;
-    this.setState((state) => {
-      return {
-        playlist:{
-          ...state.playlist,
-          playlistTitle
-      }
-    }});
+    this.playlist={
+      ...this.playlist,
+      playlistTitle
+  }
   }
   
   
@@ -499,12 +542,11 @@ export default class App extends Component {
     // if (prevS.) {
       
     // }
-    // this.scrollToModel(this.state.playlist.isPlayingNow,this.state);
+    // this.scrollToModel(this.playlist.isPlayingNow,this.state);
   }
   
 
   componentDidMount(){
-    this.makePlayList();
     this.myAudioRef.current.addEventListener('loadedmetadata', () => {
       let duration = this.myAudioRef.current.duration;
       duration = this.getAudioValues(duration);
@@ -534,22 +576,21 @@ export default class App extends Component {
           isPlayed: false,
         })
       }else{
+        this.playlist = {
+          ...this.playlist,
+          playingNow : this.incrimentPlaylist(this.playlist.playingNow)
+        }
         this.setState((state) => {
           return {
             audioToastPosition : 0,
             audioBufferAmount :0,
             isPlayed: true,
-            playlist:{
-              ...this.state.playlist,
-              playingNow : this.incrimentPlaylist(state.playlist.playingNow),
-              playlistArr : state.playlist.playlistArr
-            }
+            
           }
         },()=>{
-          console.log("Entred From [ended]");
           let playingNow,currentReciter,currentSurah;
-          playingNow = this.state.playlist.playingNow;
-          [currentReciter,currentSurah] = [this.state.playlist.playlistArr [playingNow].reciter,this.state.playlist.playlistArr[playingNow].surahName];
+          playingNow = this.playlist.playingNow;
+          [currentReciter,currentSurah] = [this.playlist.playlistArr [playingNow].reciter,this.playlist.playlistArr[playingNow].surahName];
           this.setPlaylistTitle(currentReciter,currentSurah);
         }
         );
@@ -559,12 +600,17 @@ export default class App extends Component {
     });
   }
 
-  render() {
+  componentWillUnmount(){
     
+    localStorage.removeItem('playlist');
+  }
+
+  render() {
+    console.log(this.playlist);
     let audioDuration = this.state.duration;
 
     const currentAudioTime = this.state.currentAudioTime;
-    const koraeOptions = this.state.data.filter((el) => {
+    const koraeOptions = this.data.filter((el) => {
       return el.reciterMedia.length === 114;
     }
     ).map((el, i) => {
@@ -576,7 +622,7 @@ export default class App extends Component {
       </div>)
     });
 
-    let suwarOptions = this.state.data.filter((el) => {
+    let suwarOptions = this.data.filter((el) => {
       return el.reciterMedia.length === 114;
     }
     );
@@ -703,13 +749,13 @@ export default class App extends Component {
                 <i className="fas fa-indent"></i>
             </div>
             <div className="currentPlayList d-none-xm d-none-s ">
-              <div className="frontText slide-right-front">{this.state.playlist.playlistTitle}</div>
-              <div className="backText slide-right-back">{this.state.playlist.playlistTitle}</div>
+              <div className="frontText slide-right-front">{this.playlist.playlistTitle}</div>
+              <div className="backText slide-right-back">{this.playlist.playlistTitle}</div>
             </div>
           </div>
           <div className="currentPlayList d-flex-sm d-none">
-            <div className="frontText slide-right-front">{this.state.playlist.playlistTitle}</div>
-            <div className="backText slide-right-back">{this.state.playlist.playlistTitle}</div>
+            <div className="frontText slide-right-front">{this.playlist.playlistTitle}</div>
+            <div className="backText slide-right-back">{this.playlist.playlistTitle}</div>
           </div>
         </main>
         <div 
