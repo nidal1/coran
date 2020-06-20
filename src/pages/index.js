@@ -13,7 +13,7 @@ export default class App extends Component {
       audioToastPosition : 0,
       audioBufferAmount :0,
       isShowSpiner : false,
-      isPlayed: true,
+      isPlayed: window.innerWidth > 980,
       isShowModelSetting:false,
       isShowModelPlaylist:false,
       isKoraeErrorCheckingShow:false,
@@ -640,17 +640,7 @@ export default class App extends Component {
     let maxRange = this.convertToSeconds(audioDuration);
     let value = this.convertToSeconds(currentAudioTime);
     let audioVal = this.state.currentAudioVolumeValue;
-    let canPlay;
-    
-    if (this.state.isPlayed){
-
-      canPlay = this.state.isPlayed;
-    }
-
-    if (window.innerWidth <= 980) {
-      canPlay = true;
-    }
-    
+    let canPlay = this.state.isPlayed;
     return (
       <React.Fragment>
         <div 
