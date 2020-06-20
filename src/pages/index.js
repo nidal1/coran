@@ -640,7 +640,17 @@ export default class App extends Component {
     let maxRange = this.convertToSeconds(audioDuration);
     let value = this.convertToSeconds(currentAudioTime);
     let audioVal = this.state.currentAudioVolumeValue;
-    let canPlay = this.state.isPlayed;
+    let canPlay;
+    
+    if (this.state.isPlayed){
+
+      canPlay = this.state.isPlayed;
+    }
+
+    if (window.innerWidth <= 980) {
+      canPlay = true;
+    }
+    
     return (
       <React.Fragment>
         <div 
