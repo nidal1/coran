@@ -12,7 +12,7 @@ export default class App extends Component {
       currentAudioTime:"00:00:00",
       audioToastPosition : 0,
       audioBufferAmount :0,
-      isShowSpiner : false,
+      isShowSpiner : true,
       isPlayed: window.innerWidth > 980,
       isShowModelSetting:false,
       isShowModelPlaylist:false,
